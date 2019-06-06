@@ -114,10 +114,15 @@ impl Key {
 
 impl From<ffi::TCOD_key_t> for Key {
     fn from(tcod_key: ffi::TCOD_key_t) -> Key {
+        let code = keycode_from_native(tcod_key.vk).unwrap();
+        let printable = match code {
+            KeyCode::Text => tcod_key.text[0],
+            _ => tcod_key.c
+        } as u8 as char;
         Key {
-            code: keycode_from_native(tcod_key.vk).unwrap(),
+            code,
             text: tcod_key.text,
-            printable: tcod_key.c as u8 as char,
+            printable,
             pressed: tcod_key.pressed != 0,
             left_alt: tcod_key.lalt != 0,
             left_ctrl: tcod_key.lctrl != 0,
